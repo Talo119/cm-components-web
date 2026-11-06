@@ -1,6 +1,6 @@
 # cm-web-components
 
-A React component library built on Material UI. It isn't published to npm yet, and the package name will change before the first release.
+A React component library built on Material UI.
 
 ## Requirements
 
@@ -14,7 +14,7 @@ A React component library built on Material UI. It isn't published to npm yet, a
 
 ```tsx
 import Button from '@mui/material/Button'
-import { CmThemeProvider, createCmTheme } from 'cm-web-components'
+import { CmThemeProvider, createCmTheme } from '@cmotino/cm-web-components'
 
 const theme = createCmTheme({
   palette: { primary: { main: '#0b6e4f' } },
