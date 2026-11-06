@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a React component library built on Material UI, to be published to npm. The scaffolding, default theme and `CmThemeProvider` are in place. No components exist yet: the next item is Button, which needs a spec first. See `docs/specs/roadmap.md`.
 
-The package isn't published yet. `package.json` keeps `"private": true` and a working name until an npm scope is chosen. See the open questions in `docs/specs/0000-architecture.md`.
+The package is named `@cmotino/cm-web-components`. Releases to npm go through the Changesets workflow in `.github/workflows/release.yml`.
 
 ## Specifications
 

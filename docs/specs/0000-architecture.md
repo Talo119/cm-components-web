@@ -4,8 +4,6 @@
 - **Date:** 2026-11-06
 - **Applies to:** every component and the build, test and release setup
 
-The package name below uses the placeholder `@<scope>/ui`. See [Open questions](#open-questions).
-
 ## 1. Goals and non-goals
 
 **Goals**
@@ -40,7 +38,7 @@ Components use a hybrid API.
 
 **Naming and types:**
 
-- Components are exported without a prefix: `import { Button } from '@<scope>/ui'`. Consumers who also use MUI's `Button` can alias the import.
+- Components are exported without a prefix: `import { Button } from '@cmotino/cm-web-components'`. Consumers who also use MUI's `Button` can alias the import.
 - Prop types are exported as `<Component>Props`.
 - Composites that hold typed data are generic, such as `Table<Row>`. Public types don't use `any`.
 - Every item in a data array has a stable `id`, or the component accepts a `getItemId` function.
@@ -63,7 +61,7 @@ Styling can be overridden at three levels. Narrower levels win.
 | Instance | `sx`, `className`, `slotProps` | One-off changes |
 
 ```tsx
-import { CmThemeProvider, createCmTheme, Button } from '@<scope>/ui'
+import { CmThemeProvider, createCmTheme, Button } from '@cmotino/cm-web-components'
 
 const theme = createCmTheme({
   palette: { primary: { main: '#0b6e4f' } },
@@ -134,7 +132,7 @@ The library ships no global CSS. The tokens in `src/index.css` belong to the tem
 
 ```jsonc
 {
-  "name": "@<scope>/ui",
+  "name": "@cmotino/cm-web-components",
   "type": "module",
   "sideEffects": false,
   "files": ["dist"],
@@ -146,7 +144,7 @@ The library ships no global CSS. The tokens in `src/index.css` belong to the tem
 }
 ```
 
-`"private": true` is removed once the npm scope is chosen (see [Open questions](#open-questions)). Until then it stays, because it stops `npm publish` and makes Changesets skip the package, so the release workflow can't publish under a placeholder name. `publishConfig.access` is required, because scoped packages are private on npm by default.
+`publishConfig.access` is required, because scoped packages are private on npm by default.
 
 ## 6. Folder structure
 
@@ -212,4 +210,4 @@ Tool versions confirmed compatible with Vite 8 and TypeScript 6: Storybook 10.6,
 
 ## Open questions
 
-1. **npm scope and package name.** Needed before the first publish, and doesn't block other work. `@<scope>/ui` is a placeholder until a username or org is chosen. `package.json` keeps the name `cm-web-components` and `"private": true` until then. Choosing a scope means setting `name`, removing `private` and updating the package name in any pending `.changeset/*.md` files.
+None.
