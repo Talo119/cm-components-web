@@ -1,78 +1,67 @@
-# React + TypeScript + Vite
+# cm-web-components
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React component library built on Material UI. It isn't published to npm yet, and the package name will change before the first release.
 
-Currently, two official plugins are available:
+## Requirements
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 and MUI 9, with Emotion
+- ES modules only
+- TypeScript consumers need `moduleResolution` set to `bundler`, `node16` or `nodenext`
 
-## React Compiler
+## Theming
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+`CmThemeProvider` applies the default look. Use `createCmTheme` to override it for your project:
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+```tsx
+import Button from '@mui/material/Button'
+import { CmThemeProvider, createCmTheme } from 'cm-web-components'
 
-## Expanding the ESLint configuration
+const theme = createCmTheme({
+  palette: { primary: { main: '#0b6e4f' } },
+  shape: { borderRadius: 4 },
+})
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+export function App() {
+  return (
+    <CmThemeProvider theme={theme}>
+      <Button sx={{ mt: 2 }}>Save</Button>
+    </CmThemeProvider>
+  )
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+**A top-level `palette` override only changes light mode.** To change dark mode, override `colorSchemes.dark`:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```ts
+createCmTheme({
+  palette: { primary: { main: '#0b6e4f' } },
+  colorSchemes: { dark: { palette: { primary: { main: '#7fd8b6' } } } },
+})
 ```
+
+**Colors follow the operating system by default.** For a manual light and dark toggle, set a color scheme selector:
+
+```ts
+createCmTheme({ cssVariables: { colorSchemeSelector: 'class' } })
+```
+
+`CmThemeProvider` adds no global styles. Pass `baseline` to include MUI's `CssBaseline`. Fonts are up to your project.
+
+## Development
+
+Use the Node version in `.nvmrc`, then:
+
+```sh
+npm install
+npm run dev
+```
+
+`npm run dev` starts Storybook. Before opening a pull request, run:
+
+```sh
+npm run lint && npm run typecheck && npm test && npm run build && npm run test:dist
+```
+
+Pull requests with user-facing changes need a changelog entry from `npm run changeset`.
+
+Design decisions are in [`docs/specs`](./docs/specs/README.md). Start with the [architecture spec](./docs/specs/0000-architecture.md) and the [roadmap](./docs/specs/roadmap.md).
