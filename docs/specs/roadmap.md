@@ -8,7 +8,7 @@ Components are built in this order, so each one can reuse those before it. Spec 
 | --- | --- | --- | --- | --- | --- |
 | 0 | Library scaffolding | Setup | Architecture spec accepted | [0000](./0000-architecture.md) | Implemented |
 | 1 | Theme and provider | Foundation | Scaffolding | [0000](./0000-architecture.md), section 3 | Implemented |
-| 2 | Button | Simple | Theme | None yet (planned as `0001`) | Not started |
+| 2 | Button | Simple | Theme | [0001](./0001-button.md) | Implemented |
 | 3 | Button group | Simple | Button | None yet | Not started |
 | 4 | Typography | Simple | Theme | None yet | Not started |
 | 5 | Link | Simple | Typography | None yet | Not started |
