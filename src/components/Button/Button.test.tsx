@@ -283,8 +283,11 @@ describe('Button', () => {
       })
     })
 
+    // The library's root `textTransform: 'none'` is what keeps the label as
+    // typed over an uppercase `typography.button`, so it only shows once replaced.
     it('replaces the library root styles when styleOverrides.root is a function', () => {
       renderThemed(<Button>Save</Button>, {
+        typography: { button: { textTransform: 'uppercase' } },
         components: {
           MuiButton: { styleOverrides: { root: () => ({ letterSpacing: '3px' }) } },
         },

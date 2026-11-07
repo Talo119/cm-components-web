@@ -70,6 +70,9 @@ export const defaultThemeOptions: ThemeOptions = {
     body1: { fontSize: '0.875rem' },
     body2: { fontSize: '0.875rem', fontWeight: 400 },
     caption: { fontSize: '0.75rem', fontWeight: 400 },
+    // Matches Button's label. Also reaches other components that use this
+    // style, such as Tab and ToggleButton.
+    button: { textTransform: 'none' },
   },
   shape: { borderRadius: 8 },
   focusVisible: true,
@@ -77,6 +80,18 @@ export const defaultThemeOptions: ThemeOptions = {
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: { root: { textTransform: 'none' } },
+    },
+    // A group passes its own `disableElevation` to its buttons, which beats
+    // `MuiButton.defaultProps`, so the group needs the same default.
+    MuiButtonGroup: {
+      defaultProps: { disableElevation: true },
+    },
+    // MUI maps subtitles to `<h6>`, which puts them in the heading outline.
+    // Variants not listed here keep MUI's mapping.
+    MuiTypography: {
+      defaultProps: {
+        variantMapping: { subtitle1: 'p', subtitle2: 'p' },
+      },
     },
   },
 }

@@ -64,6 +64,12 @@ describe('built output', () => {
   it('exposes only the public API', async () => {
     const api = await import(join(dist, 'index.js'))
 
-    expect(Object.keys(api).sort()).toEqual(['Button', 'CmThemeProvider', 'createCmTheme'])
+    expect(Object.keys(api).sort()).toEqual([
+      'Button',
+      'ButtonGroup',
+      'CmThemeProvider',
+      'Typography',
+      'createCmTheme',
+    ])
   })
 })
