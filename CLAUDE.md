@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-This is a React component library built on Material UI, to be published to npm. The scaffolding, default theme, `CmThemeProvider` and Button are in place. The next item is Button group, which needs a spec first. See `docs/specs/roadmap.md`.
+This is a React component library built on Material UI, to be published to npm. The scaffolding, default theme, `CmThemeProvider`, Button, Button group and Typography are in place. The next item is Link, which needs a spec first. See `docs/specs/roadmap.md`.
 
 The package is named `@cmotino/cm-web-components`. Releases to npm go through the Changesets workflow in `.github/workflows/release.yml`.
 

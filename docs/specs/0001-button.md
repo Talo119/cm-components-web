@@ -94,7 +94,7 @@ export const defaultThemeOptions: ThemeOptions = {
 
 **`focusVisible` applies to the whole theme.** It turns on MUI's keyboard focus ring for every MUI component, which later specs can rely on. It's needed here because `disableElevation` removes the shadow that `contained` buttons otherwise show on focus. Projects change it with `createCmTheme({ focusVisible: { outlineColor: '...' } })` or turn it off with `focusVisible: false`.
 
-**`styleOverrides.root` is kept as an object.** A project's object merges with it. A project's function replaces it, because `deepmerge` only merges plain objects, so the label goes back to uppercase unless the function sets `textTransform` itself. The documentation must state this.
+**`styleOverrides.root` is kept as an object.** A project's object merges with it. A project's function replaces it, because `deepmerge` only merges plain objects. The label then follows `typography.button`, which isn't uppercase under the library theme since [0003](./0003-typography.md#styling-hooks), but is uppercase if a project sets it so, unless the function sets `textTransform` itself. The documentation must state this.
 
 ## Accessibility
 
@@ -160,6 +160,6 @@ Tested on 2026-11-06 with MUI 9.5.0 and TypeScript 6.0, using jsdom and not real
 | `slotProps` in `Button.d.ts` | Not present |
 | `disableElevation` on a focused `contained` button, without `focusVisible` | No shadow and no outline |
 | `focusVisible: true` through `deepmerge` and `createTheme` | Outline on `contained`, `outlined` and `text`. An object override and `false` both work |
-| Function in `styleOverrides.root` through `deepmerge`, over an object default | Replaces the default, and the label returns to uppercase |
+| Function in `styleOverrides.root` through `deepmerge`, over an object default | Replaces the default, and the label returns to uppercase. Since [0003](./0003-typography.md), it follows `typography.button` instead, which isn't uppercase by default |
 | `loading` on a `<button>` | `disabled`, with `role="progressbar"` labelled by the button |
 | `disabled` or `loading` with `href` | `aria-disabled="true"`, `tabindex="-1"` and `href` kept. With `loading`, `pointer-events: none` blocked the test's click |
