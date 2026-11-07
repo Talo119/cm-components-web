@@ -20,7 +20,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@eslint/js": "^10.0.1",
-    "@fontsource/roboto": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
     "@mui/icons-material": "^9.5.0",
     "@mui/material": "^9.5.0",
     "@rolldown/plugin-babel": "^0.3.0",

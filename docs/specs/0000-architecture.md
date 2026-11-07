@@ -89,6 +89,22 @@ Don't use `createTheme(defaultThemeOptions, overrides)`. With color schemes defi
 
 By default the colors follow the operating system, because MUI uses the `media` color scheme selector when both schemes exist. `defaultMode` and `setMode` don't change the colors under that selector. A project with a manual toggle sets a selector: `createCmTheme({ cssVariables: { colorSchemeSelector: 'class' } })`.
 
+**Default look:** the default theme's tokens come from the reference theme in `references/theme/themePrimitives.ts`. Every component's default look is built from these tokens, so a new component spec states how its look uses them, rather than inventing its own colors, sizes or radii.
+
+| Token | Value |
+| --- | --- |
+| Palette | `primary`, `info`, `success`, `warning`, `error`, `grey`, `divider`, `background`, `text` and `action`, built from the `brand`, `gray`, `green`, `orange` and `red` scales, with separate light and dark values. `secondary` keeps MUI's default |
+| `palette.baseShadow` | A soft shadow per color scheme, used by `shadows[1]` |
+| Typography | `fontFamily: 'Inter, sans-serif'`, with the reference's sizes and weights for `h1` to `h6`, `subtitle1`, `subtitle2`, `body1`, `body2` and `caption` |
+| `shape.borderRadius` | `8` |
+| `shadows` | MUI's, except `shadows[1]`, which is `var(--<prefix>-palette-baseShadow, <light value>)` |
+
+- **Where they live:** the color scales are in `src/theme/tokens.ts` and the theme options in `src/theme/defaultTheme.ts`. The scales are private. Components read colors from the theme, never from `tokens.ts`.
+- **Shadows:** MUI can't vary `shadows` by color scheme, so `shadows[1]` points at the `baseShadow` CSS variable, which can. `createCmTheme` builds the array with the project's `cssVarPrefix`, and a project's own `shadows` array replaces it completely. Under `cssVariables: false`, the fallback gives the light shadow.
+- **Not copied from the reference:** its `getDesignTokens` function, which duplicates `colorSchemes` for themes without CSS variables. Its augmentation of `PaletteColor` with every scale step, because those keys don't exist at run time. Its `highlighted` Paper variant and `text.warning` color, which no spec uses yet. Its `--template-` CSS variable prefix.
+- **Fonts:** the library sets the font family but doesn't load it. A project that wants Inter loads it, for example with `@fontsource/inter`. Without it, the text falls back to the browser's sans-serif font.
+- **Type augmentation:** `src/theme/createCmTheme.ts` adds `baseShadow` to MUI's `Palette` and `PaletteOptions`, so it reaches consumers through the emitted declarations.
+
 **`CmThemeProvider`:**
 
 - Wraps MUI's `ThemeProvider`. `theme` is optional and defaults to the library theme.
@@ -115,7 +131,7 @@ The library ships no global CSS. The tokens in `src/index.css` belong to the tem
 
 **Removed:** `styled-components` and `@mui/styled-engine-sc`. Neither is used in `src`, and the adapter would require a bundler alias in every consuming project.
 
-**Moved to dev dependencies:** `@fontsource/roboto`, for Storybook only. Consumers choose and load their own fonts.
+**Dev dependency:** `@fontsource/inter`, for Storybook only, replacing `@fontsource/roboto` to match the default theme's font. Consumers choose and load their own fonts.
 
 **Moved to dev dependencies:** `@mui/icons-material`, for stories only. It isn't a dependency or peer of the library, because it takes 172 MB on disk and icons are passed as `ReactNode`. Icons the library needs internally, such as a chevron, are made with `createSvgIcon` from `@mui/material/utils`.
 
@@ -205,6 +221,9 @@ Tested on 2026-11-06 with MUI 9.5.0 and TypeScript 6.0. Recheck these when upgra
 | Build with Vite 8 (Rolldown) and `preserveModules` | `"use client"` stays the first statement of the module |
 | Importing only `createCmTheme` from the built package, bundled with esbuild | `CmThemeProvider` and MUI's `ThemeProvider` are tree-shaken out |
 | `renderToString` of `CmThemeProvider` from the built package | Renders on the server, including the override |
+| Color schemes without `shadows` support (`ColorSystemOptions` in MUI 9.5.0) | `shadows` is theme-wide, so per-scheme shadows need a CSS variable |
+| `shadows[1]` set to `var(--mui-palette-baseShadow, ...)` with `palette.baseShadow` in each scheme | The generated style sheets define `--mui-palette-baseShadow` with the light and dark values |
+| `@fontsource-variable/inter` | Registers the family as `Inter Variable`, which doesn't match `Inter`. `@fontsource/inter` registers `Inter` |
 
 Tool versions confirmed compatible with Vite 8 and TypeScript 6: Storybook 10.6, Vitest 5.1, jsdom 31, Changesets 3.0 with `changesets/action` v2.
 

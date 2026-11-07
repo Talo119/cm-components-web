@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-This is a React component library built on Material UI, to be published to npm. The scaffolding, default theme and `CmThemeProvider` are in place. No components exist yet: the next item is Button, which needs a spec first. See `docs/specs/roadmap.md`.
+This is a React component library built on Material UI, to be published to npm. The scaffolding, default theme, `CmThemeProvider` and Button are in place. The next item is Button group, which needs a spec first. See `docs/specs/roadmap.md`.
 
 The package is named `@cmotino/cm-web-components`. Releases to npm go through the Changesets workflow in `.github/workflows/release.yml`.
 
@@ -39,7 +39,7 @@ Storybook doesn't type-check. Plain `npx tsc` checks nothing because the root `t
 - **Build:** `vite.config.ts` builds ES modules with `preserveModules`, leaving peer dependencies and `@mui/*` external. The same file configures Vitest, with a `unit` project for `src/` and a `dist` project for `tests/`.
 - **TypeScript projects:** `tsconfig.app.json` covers `src/` and `.storybook/` (browser code), and `tsconfig.node.json` covers `vite.config.ts` and `tests/` (Node code). `tsconfig.build.json` only emits declarations for the published code, so it's run by `npm run build` and isn't a project reference.
 - **React Compiler:** it runs through the Babel plugin in `vite.config.ts`, so memoization is handled automatically. Don't add `useMemo`, `useCallback`, or `memo` by default. The README notes that this slows dev and build.
-- **Styling:** Emotion through MUI, with no global CSS. Colors, spacing and radii come from the theme, as described in section 3 of the architecture spec.
+- **Styling:** Emotion through MUI, with no global CSS. Colors, spacing and radii come from the theme, as described in section 3 of the architecture spec. The default theme's tokens are ported from `references/theme/themePrimitives.ts`, so every new component's default look is built from them. That file is reference material only: it isn't built, type-checked or linted.
 - **Server Components:** a module that uses hooks or browser APIs starts with `'use client'`. Add new ones to `tests/dist.test.ts`.
 
 ## Compiler and lint constraints
