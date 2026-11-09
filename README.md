@@ -372,7 +372,182 @@ createCmTheme({
 })
 ```
 
-**`error` colors aren't readable in dark mode.** `error.main` is 2.15:1 on the dark background, so error helper text and labels on TextField, Checkbox, Select, Radio group and Switch fail 4.5:1 there. This is an open question in [spec 0005](./docs/specs/0005-inputs.md#open-questions).
+## Slider
+
+`Slider` is MUI's `Slider` with its label, helper text and error state built in, for a value where the position in a range matters more than the exact number, such as volume or a price range. It takes `label`, `helperText`, `error` and `disabled` as Checkbox does, but not `required`, because a slider always has a value:
+
+```tsx
+import { Slider } from '@cmotino/cm-web-components'
+
+<Slider label="Volume" defaultValue={30} />
+
+<Slider
+  label="Price"
+  value={price}
+  onChange={(_, value) => setPrice(value)}
+  onChangeCommitted={(_, value) => search({ price: value })}
+  min={0}
+  max={500}
+  step={10}
+  getAriaLabel={(index) => (index === 0 ? 'Minimum price' : 'Maximum price')}
+  getAriaValueText={(value) => `${value} dollars`}
+/>
+```
+
+**`onChange` gets the same kind of value you pass:** a number for a number, an array for an array. It fires on every step while dragging, so send requests from `onChangeCommitted`, which fires once when the user lets go or presses a key.
+
+**Name both thumbs of a range with `getAriaLabel`.** The root then becomes a group named by the `label`, so screen readers announce "Price" and then "Minimum price". A single thumb is named by `label`, or by `aria-label` or `aria-labelledby` without one. Pass `getAriaValueText` or `aria-valuetext` when the number alone isn't clear.
+
+**The root is a `FormControl` `<div>` that fills its container.** `ref`, `sx`, `className`, `style` and `data-*` props reach it. `aria-label`, `aria-labelledby` and `aria-describedby` reach every thumb's `<input>`, and `error` sets `aria-invalid` on them. `name` submits one value per thumb. A vertical slider needs a height on the root. Other MUI props, such as `tabIndex`, go through `slotProps.control`, and MUI's `thumb`, `rail`, `track`, `mark` and `valueLabel` slots through `slotProps.control.slotProps`. The slots are `formLabel`, `control`, `htmlInput` for every thumb's `<input>`, and `formHelperText`. Style it with `MuiSlider`, `MuiFormControl`, `MuiFormLabel` and `MuiFormHelperText`.
+
+**The rail is `grey[500]` and opaque, not MUI's translucent color,** because MUI's rail is below the 3:1 that WCAG 2.2 AA asks for the parts of a control. This applies to every MUI `Slider` under the library theme, including MUI's own. Disabled and inverted rails keep MUI's styles. **A project's own `rail` in `MuiSlider.styleOverrides` replaces the library's rule,** because style functions don't merge, so keep the rail at 3:1 or more if you replace it:
+
+```ts
+createCmTheme({
+  components: {
+    MuiSlider: { styleOverrides: { rail: { backgroundColor: '#5b6b7f', opacity: 1 } } },
+  },
+})
+```
+
+## Rating
+
+`Rating` is MUI's star rating with `label`, `helperText`, `error`, `required` and `disabled` built in, for collecting or showing a score on a small fixed scale. Its group is named by the `label`:
+
+```tsx
+import { Rating } from '@cmotino/cm-web-components'
+
+<Rating label="How was your order?" defaultValue={null} name="order-rating" />
+
+<Rating
+  label="Quality"
+  value={quality}
+  onChange={(_, value) => setQuality(value)}
+  required
+  error={submitted && quality == null}
+  helperText={submitted && quality == null ? 'Choose a rating' : ' '}
+/>
+
+<Rating label="Average rating" value={4.5} precision={0.5} readOnly size="small" />
+```
+
+**`onChange` can report `null`.** Picking the current value again clears it, as in MUI. Ignore `null` in `onChange` if a rating can't be cleared. `onChangeActive` reports the hovered value, and `-1` when the pointer leaves.
+
+**`required` doesn't stop a native form submit.** It shows the asterisk and sets `aria-required` on the group, but MUI checks a hidden "Empty" radio when there's no value, so the browser always sees an answer. Check the value yourself before submitting, as in the second example. An empty rating submits an empty string under `name`.
+
+**A read-only rating is an image, not a group.** It has no inputs, and it's named by the `label` and the value, so screen readers announce "Average rating, 4.5 Stars". Without a `label`, it's named by `getLabelText` only, so write one that gives the context, or pass `aria-label`. The names are in English, so projects in other languages pass `getLabelText` and `emptyLabelText`.
+
+**The root is a `FormControl` `<div>`.** `ref`, `sx`, `className`, `style` and `data-*` props reach it. `aria-label`, `aria-labelledby` and `aria-describedby` reach the element with `role="radiogroup"`, or `role="img"` when `readOnly`. Other MUI props, such as `component`, go through `slotProps.control`, and MUI's `label`, `icon` and `decimal` slots through `slotProps.control.slotProps`. The slots are `formLabel`, `control` and `formHelperText`. Style it with `MuiRating`, `MuiFormControl`, `MuiFormLabel` and `MuiFormHelperText`.
+
+**Filled stars are `warning.main` and empty stars `grey[500]`,** instead of MUI's hard-coded `#faaf00` and its `action.disabled` outline, which can't be seen against the background. A project that changes `palette.warning` changes the stars too. This applies to every MUI `Rating` under the library theme, including MUI's own. In light mode, `warning.main` is 2.71:1 on the background, below 3:1. Empty stars are outlined and filled ones solid, so the score doesn't rely on color alone. **A project's own `root` or `iconEmpty` in `MuiRating.styleOverrides` replaces the library's color,** because style functions don't merge:
+
+```ts
+createCmTheme({
+  components: {
+    MuiRating: { styleOverrides: { root: ({ theme }) => ({ color: (theme.vars || theme).palette.primary.main }) } },
+  },
+})
+```
+
+**`error` colors aren't readable in dark mode.** `error.main` is 2.15:1 on the dark background, so error helper text and labels on TextField, Checkbox, Select, Radio group, Switch, Slider and Rating fail 4.5:1 there. This is an open question in [spec 0005](./docs/specs/0005-inputs.md#open-questions).
+
+## Avatar
+
+`Avatar` is MUI's `Avatar`, for the photo, initials or icon of a person or thing. Every MUI prop works. When the image fails to load, it shows the children, then the first letter of `alt`, then a person icon:
+
+```tsx
+import { Avatar } from '@cmotino/cm-web-components'
+import FolderIcon from '@mui/icons-material/Folder'
+
+<Avatar src={user.photoUrl} alt={user.name} />
+
+<Avatar role="img" aria-label="Jane Doe">JD</Avatar>
+
+<Avatar variant="rounded"><FolderIcon /></Avatar>
+
+<Avatar src={user.photoUrl} alt={user.name} sx={{ width: 24, height: 24, fontSize: '0.75rem' }} />
+```
+
+**Name it for screen readers.** Pass the person's name in `alt`, or `alt=""` when the name is shown next to the avatar. Screen readers read initials as letters, such as "J D", so an avatar that stands alone gets `role="img"` and `aria-label` with the full name, and one next to the name gets `aria-hidden`. A clickable avatar goes inside a Button or a link.
+
+**Sizes are set with `sx`.** The default is 40px. Set `fontSize` too, because initials keep their 20px font otherwise, and pass at most two letters. A color per person goes in `sx={{ bgcolor }}`, and must keep 4.5:1 with the text.
+
+**Initials, icons and the fallback are white on `grey[500]`,** instead of MUI's colors, which are below 4.5:1 on both color schemes. Avatars with a working image aren't affected. This applies to every MUI `Avatar` under the library theme, including MUI's own. **A project's own `colorDefault` in `MuiAvatar.styleOverrides` replaces the library's colors,** because style functions don't merge. A `root` object merges with them.
+
+## Badge
+
+`Badge` is MUI's `Badge`, for a count or dot on the corner of another element. Every MUI prop works, including `max`, `showZero`, `invisible` and `variant="dot"`:
+
+```tsx
+import { Avatar, Badge } from '@cmotino/cm-web-components'
+import IconButton from '@mui/material/IconButton'
+import MailIcon from '@mui/icons-material/Mail'
+
+<IconButton aria-label={`Messages, ${unread} unread`}>
+  <Badge badgeContent={unread}>
+    <MailIcon />
+  </Badge>
+</IconButton>
+
+<Badge variant="dot" color="success" overlap="circular">
+  <Avatar src={user.photoUrl} alt={`${user.name}, online`} />
+</Badge>
+```
+
+**Screen readers never read the badge.** It's `aria-hidden`, so put its information in the child's accessible name, as in both examples. A count that changes while the user is on the page isn't announced.
+
+**The default color is `error`, not MUI's `default`,** which draws the number with no background. `error` is the only theme color whose text meets 4.5:1 on both color schemes: `primary` and `info` are below it in both, and `warning` in dark mode. This applies to every MUI `Badge` under the library theme, including MUI's own. A project changes it with:
+
+```ts
+createCmTheme({
+  components: {
+    MuiBadge: { defaultProps: { color: 'primary' } },
+  },
+})
+```
+
+A count above `max`, 99 by default, shows as "99+". A count of 0 hides the badge unless `showZero` is set. A parent with `overflow: hidden` can clip the badge.
+
+## Chip
+
+`Chip` is MUI's `Chip`, for a tag, a status, a filter or a selected value. Every MUI prop works. The text goes in `label`, and `icon`, `avatar` and `deleteIcon` must be elements:
+
+```tsx
+import { Avatar, Chip } from '@cmotino/cm-web-components'
+import DoneIcon from '@mui/icons-material/Done'
+
+<Chip label="Paid" color="success" variant="outlined" />
+
+<Chip
+  label="Only open"
+  icon={onlyOpen ? <DoneIcon /> : undefined}
+  variant={onlyOpen ? 'filled' : 'outlined'}
+  onClick={() => setOnlyOpen(!onlyOpen)}
+  aria-pressed={onlyOpen}
+/>
+
+<Chip
+  label={user.name}
+  avatar={<Avatar src={user.photoUrl} alt="" />}
+  onDelete={() => removeRecipient(user.id)}
+/>
+```
+
+**Clickable and deletable chips are buttons.** `Tab` reaches them, `Enter` and `Space` call `onClick`, and `Backspace` and `Delete` call `onDelete`. Clicking the delete icon only calls `onDelete`. The delete icon isn't announced, so tell keyboard users that `Backspace` removes a chip, such as in helper text. Chip doesn't remove itself or move focus after a delete, so move focus to the next chip or the field yourself. Pass `aria-pressed` on a chip used as a filter toggle.
+
+**The delete icon of a default chip is `text.secondary`, and `text.primary` on hover,** because MUI's translucent icon is below the 3:1 that WCAG 2.2 AA asks for a control. **Initials in its avatar are white,** because MUI's `grey[700]` is below 4.5:1 on the avatar's `grey[500]`. Colored chips keep MUI's colors, and their contrast depends on the palette: filled `primary` and `info` labels are below 4.5:1. These rules apply to every MUI `Chip` under the library theme, including MUI's own and the tags in MUI's `Autocomplete`. **A project's own `deleteIcon` or `avatar` in `MuiChip.styleOverrides` replaces the library's rule,** because style functions don't merge. A `root` object merges with them.
+
+**Disabled chips are out of the tab order.** MUI leaves a disabled chip with only `onDelete` focusable, so `Backspace` would still delete it. The library theme sets `MuiChip.defaultProps.skipFocusWhenDisabled` to `true`, which gives it `tabindex="-1"`. Don't focus disabled chips from code, because `Backspace` still deletes them then. A project that wants MUI's behavior back passes:
+
+```ts
+createCmTheme({
+  components: {
+    MuiChip: { defaultProps: { skipFocusWhenDisabled: false } },
+  },
+})
+```
+
+Long labels are cut off with an ellipsis, so set a `maxWidth` with `sx` and give the full text another way. Several chips need a flex container from you to wrap with gaps.
 
 ## Development
 

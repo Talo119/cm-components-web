@@ -16,11 +16,11 @@ Components are built in this order, so each one can reuse those before it. Spec 
 | 7 | Select | Simple | Inputs | [0006](./0006-select.md) | Implemented |
 | 8 | Radio group | Simple | Inputs | [0007](./0007-radio-group.md) | Implemented |
 | 9 | Switch | Simple | Inputs | [0008](./0008-switch.md) | Implemented |
-| 10 | Slider | Simple | Theme | None yet | Not started |
-| 11 | Rating | Simple | Theme | None yet | Not started |
-| 12 | Avatar | Simple | Theme | None yet | Not started |
-| 13 | Badge | Simple | Theme | None yet | Not started |
-| 14 | Chip | Simple | Avatar | None yet | Not started |
+| 10 | Slider | Simple | Inputs | [0009](./0009-slider.md) | Implemented |
+| 11 | Rating | Simple | Inputs | [0010](./0010-rating.md) | Implemented |
+| 12 | Avatar | Simple | Theme | [0011](./0011-avatar.md) | Implemented |
+| 13 | Badge | Simple | Theme | [0012](./0012-badge.md) | Implemented |
+| 14 | Chip | Simple | Avatar | [0013](./0013-chip.md) | Implemented |
 | 15 | Autocomplete | Simple | Inputs, Chip | None yet | Not started |
 | 16 | Tooltip | Simple | Theme | None yet | Not started |
 | 17 | Progress | Simple | Theme | None yet | Not started |
