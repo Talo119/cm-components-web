@@ -11,11 +11,11 @@ Components are built in this order, so each one can reuse those before it. Spec 
 | 2 | Button | Simple | Theme | [0001](./0001-button.md) | Implemented |
 | 3 | Button group | Simple | Button | [0002](./0002-button-group.md) | Implemented |
 | 4 | Typography | Simple | Theme | [0003](./0003-typography.md) | Implemented |
-| 5 | Link | Simple | Typography | None yet | Not started |
-| 6 | Inputs: text, checkbox | Simple | Theme | None yet | Not started |
-| 7 | Select | Simple | Inputs | None yet | Not started |
-| 8 | Radio group | Simple | Theme | None yet | Not started |
-| 9 | Switch | Simple | Theme | None yet | Not started |
+| 5 | Link | Simple | Typography | [0004](./0004-link.md) | Implemented |
+| 6 | Inputs: text, checkbox | Simple | Theme | [0005](./0005-inputs.md) | Implemented |
+| 7 | Select | Simple | Inputs | [0006](./0006-select.md) | Implemented |
+| 8 | Radio group | Simple | Inputs | [0007](./0007-radio-group.md) | Implemented |
+| 9 | Switch | Simple | Inputs | [0008](./0008-switch.md) | Implemented |
 | 10 | Slider | Simple | Theme | None yet | Not started |
 | 11 | Rating | Simple | Theme | None yet | Not started |
 | 12 | Avatar | Simple | Theme | None yet | Not started |
@@ -39,5 +39,5 @@ Components are built in this order, so each one can reuse those before it. Spec 
 
 - **Form:** whether to integrate with a form library such as React Hook Form or manage state internally.
 - **Table:** whether to use MUI's `Table` or the separate MUI X DataGrid, which adds a dependency and has paid tiers for advanced features. The answer depends on whether sorting, filtering and pagination run on the client, the server or both.
-- **Link, Tabs, Navbar and Sidebar:** how links work with each project's router. Accepting a link component as a prop would keep the library independent of any router.
+- **Tabs, Navbar and Sidebar:** how links work with each project's router. [0004](./0004-link.md#usage) answers this for Link: the library doesn't depend on a router, and a project sets its router once through `MuiLink.defaultProps.component` and `MuiButtonBase.defaultProps.LinkComponent`. These specs should reuse that setup.
 - **AppBar and Navbar:** where the line between them falls. The current plan is that AppBar is the thin MUI wrapper and Navbar is the data-driven composite built on it.

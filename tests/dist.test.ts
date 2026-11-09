@@ -30,11 +30,26 @@ describe('built output', () => {
   it('keeps one module per source file', () => {
     expect(files).toContain('theme/CmThemeProvider.js')
     expect(files).toContain('theme/createCmTheme.js')
+    expect(files).toContain('components/Checkbox/Checkbox.js')
+    expect(files).toContain('components/Select/Select.js')
+    expect(files).toContain('components/RadioGroup/RadioGroup.js')
+    expect(files).toContain('components/Switch/Switch.js')
+    expect(files).toContain('components/ToggleField.js')
   })
 
-  it('keeps "use client" as the first statement of client modules', () => {
-    expect(read('theme/CmThemeProvider.js')).toMatch(/^["']use client["'];?\s/)
-  })
+  it.each([
+    'theme/CmThemeProvider.js',
+    'components/Checkbox/Checkbox.js',
+    'components/RadioGroup/RadioGroup.js',
+    'components/Select/Select.js',
+    'components/Switch/Switch.js',
+    'components/ToggleField.js',
+  ])(
+    'keeps "use client" as the first statement of the client module %s',
+    (file) => {
+      expect(read(file)).toMatch(/^["']use client["'];?\s/)
+    },
+  )
 
   it('does not mark modules that can run on the server as client code', () => {
     expect(read('theme/createCmTheme.js')).not.toContain('use client')
@@ -67,7 +82,13 @@ describe('built output', () => {
     expect(Object.keys(api).sort()).toEqual([
       'Button',
       'ButtonGroup',
+      'Checkbox',
       'CmThemeProvider',
+      'Link',
+      'RadioGroup',
+      'Select',
+      'Switch',
+      'TextField',
       'Typography',
       'createCmTheme',
     ])
