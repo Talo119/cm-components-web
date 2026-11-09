@@ -1,3 +1,4 @@
+import { outlinedInputClasses } from '@mui/material/OutlinedInput'
 import { alpha } from '@mui/material/styles'
 import type { ThemeOptions } from '@mui/material/styles'
 import { baseShadow, brand, gray, green, orange, red } from './tokens.ts'
@@ -91,6 +92,56 @@ export const defaultThemeOptions: ThemeOptions = {
     MuiTypography: {
       defaultProps: {
         variantMapping: { subtitle1: 'p', subtitle2: 'p' },
+      },
+    },
+    // `primary.main` is below 4.5:1 on the light backgrounds, so light-mode
+    // links use `primary.dark`. In dark mode `primary.dark` fails instead.
+    // Kept as an object, so a project's `root` object merges with it.
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          variants: [
+            {
+              props: { color: 'primary' },
+              style: ({ theme }) => ({
+                color: (theme.vars || theme).palette.primary.dark,
+                ...theme.applyStyles('dark', { color: (theme.vars || theme).palette.primary.main }),
+              }),
+            },
+          ],
+        },
+      },
+    },
+    // MUI's translucent border is below the 3:1 that WCAG 2.2 AA asks for the
+    // edge of a control on both schemes. `grey[500]` passes on both, so one
+    // value covers light and dark. Hover, focus, error and disabled borders
+    // use more specific selectors and keep MUI's colors.
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: ({ theme }) => ({
+          borderColor: (theme.vars || theme).palette.grey[500],
+        }),
+        root: ({ theme }) => ({
+          // MUI resets the hover border on touch screens to its translucent color.
+          '@media (hover: none)': {
+            [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+              borderColor: (theme.vars || theme).palette.grey[500],
+            },
+          },
+        }),
+      },
+    },
+    // MUI's off track is below 3:1 against the background, and the light
+    // thumb is below 3:1 against it. `grey[500]` passes on both schemes.
+    // `opacity: 1` keeps it opaque when a project turns `focusVisible` off and
+    // MUI goes back to drawing the track with opacity. The on and disabled
+    // tracks use more specific selectors and keep MUI's colors.
+    MuiSwitch: {
+      styleOverrides: {
+        track: ({ theme }) => ({
+          backgroundColor: (theme.vars || theme).palette.grey[500],
+          opacity: 1,
+        }),
       },
     },
   },

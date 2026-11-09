@@ -101,7 +101,15 @@ describe('createCmTheme', () => {
   })
 
   it('does not change the default options', () => {
-    const before = structuredClone(defaultThemeOptions)
+    // `structuredClone` can't copy the style functions in the default options,
+    // so this copies objects and arrays and keeps functions as they are.
+    const clone = (value: unknown): unknown =>
+      Array.isArray(value)
+        ? value.map(clone)
+        : value && typeof value === 'object'
+          ? Object.fromEntries(Object.entries(value).map(([key, item]) => [key, clone(item)]))
+          : value
+    const before = clone(defaultThemeOptions)
 
     createCmTheme({ palette: { primary: { main: '#0b6e4f' } }, colorSchemes: { dark: false } })
 
