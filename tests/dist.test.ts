@@ -33,6 +33,8 @@ describe('built output', () => {
     expect(files).toContain('components/Checkbox/Checkbox.js')
     expect(files).toContain('components/Select/Select.js')
     expect(files).toContain('components/RadioGroup/RadioGroup.js')
+    expect(files).toContain('components/Rating/Rating.js')
+    expect(files).toContain('components/Slider/Slider.js')
     expect(files).toContain('components/Switch/Switch.js')
     expect(files).toContain('components/ToggleField.js')
   })
@@ -41,7 +43,9 @@ describe('built output', () => {
     'theme/CmThemeProvider.js',
     'components/Checkbox/Checkbox.js',
     'components/RadioGroup/RadioGroup.js',
+    'components/Rating/Rating.js',
     'components/Select/Select.js',
+    'components/Slider/Slider.js',
     'components/Switch/Switch.js',
     'components/ToggleField.js',
   ])(
@@ -80,13 +84,18 @@ describe('built output', () => {
     const api = await import(join(dist, 'index.js'))
 
     expect(Object.keys(api).sort()).toEqual([
+      'Avatar',
+      'Badge',
       'Button',
       'ButtonGroup',
       'Checkbox',
+      'Chip',
       'CmThemeProvider',
       'Link',
       'RadioGroup',
+      'Rating',
       'Select',
+      'Slider',
       'Switch',
       'TextField',
       'Typography',

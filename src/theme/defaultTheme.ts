@@ -144,5 +144,66 @@ export const defaultThemeOptions: ThemeOptions = {
         }),
       },
     },
+    // MUI's rail is the slider's color at 38% opacity, which is below 3:1
+    // against the background on both schemes. `grey[500]` passes on both. A
+    // disabled slider is exempt, and the inverted rail is the colored part of
+    // the slider, so both keep MUI's styles.
+    MuiSlider: {
+      styleOverrides: {
+        rail: ({ theme, ownerState }) =>
+          ownerState.disabled || ownerState.track === 'inverted'
+            ? {}
+            : { backgroundColor: (theme.vars || theme).palette.grey[500], opacity: 1 },
+      },
+    },
+    // MUI hard-codes `#faaf00` for filled stars, which isn't from the theme,
+    // and gives empty stars `action.disabled`, which is below 3:1 against the
+    // background on both schemes. `grey[500]` passes on both. Filled stars are
+    // solid and empty ones outlined, so the value doesn't rely on color alone.
+    MuiRating: {
+      styleOverrides: {
+        root: ({ theme }) => ({ color: (theme.vars || theme).palette.warning.main }),
+        iconEmpty: ({ theme }) => ({ color: (theme.vars || theme).palette.grey[500] }),
+      },
+    },
+    // MUI draws initials and the fallback icon in `background.default` on
+    // `grey[400]` or `grey[600]`, which is below 4.5:1 on both schemes. White
+    // on `grey[500]` passes on both, and `grey[500]` stays visible against
+    // the background. `colorDefault` only applies without a working image.
+    MuiAvatar: {
+      styleOverrides: {
+        colorDefault: ({ theme }) => ({
+          color: (theme.vars || theme).palette.common.white,
+          backgroundColor: (theme.vars || theme).palette.grey[500],
+        }),
+      },
+    },
+    // MUI's `default` color draws the count with no background. `error` is
+    // the only theme color whose text meets 4.5:1 on both schemes.
+    MuiBadge: {
+      defaultProps: { color: 'error' },
+    },
+    // On default chips, MUI's translucent delete icon is below 3:1, and its
+    // avatar text, `grey[700]` or `grey[300]`, is below 4.5:1 on the avatar's
+    // `grey[500]`. Colored chips take both from their palette color.
+    // MUI only disables `ButtonBase` on clickable chips, so a disabled chip
+    // with just `onDelete` keeps `tabindex="0"` and `Backspace` deletes it.
+    // `skipFocusWhenDisabled` takes it out of the tab order.
+    MuiChip: {
+      defaultProps: { skipFocusWhenDisabled: true },
+      styleOverrides: {
+        deleteIcon: ({ theme, ownerState }) =>
+          ownerState.color === 'default'
+            ? {
+                color: (theme.vars || theme).palette.text.secondary,
+                '&:hover': { color: (theme.vars || theme).palette.text.primary },
+              }
+            : {},
+        avatar: ({ theme, ownerState }) =>
+          ownerState.color === 'default'
+            ? { color: (theme.vars || theme).palette.common.white }
+            : {},
+      },
+    },
   },
 }

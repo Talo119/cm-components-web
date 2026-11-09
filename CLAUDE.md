@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-This is a React component library built on Material UI, to be published to npm. The scaffolding, default theme, `CmThemeProvider`, Button, Button group, Typography, Link, TextField, Checkbox, Select, Radio group and Switch are in place. The field props in `src/components/fieldProps.ts` are shared by Checkbox, Select, Radio group and Switch, and Checkbox and Switch share their structure through the private `src/components/ToggleField.tsx`. The next item is Slider, which needs a spec first. See `docs/specs/roadmap.md`.
+This is a React component library built on Material UI, to be published to npm. The scaffolding, default theme, `CmThemeProvider`, Button, Button group, Typography, Link, TextField, Checkbox, Select, Radio group, Switch, Slider, Rating, Avatar, Badge and Chip are in place. The field props in `src/components/fieldProps.ts` are shared by Checkbox, Select, Radio group, Switch, Slider and Rating, and Checkbox and Switch share their structure through the private `src/components/ToggleField.tsx`. The next item is Autocomplete, which needs a spec first. See `docs/specs/roadmap.md`.
 
 The package is named `@cmotino/cm-web-components`. Releases to npm go through the Changesets workflow in `.github/workflows/release.yml`.
 
