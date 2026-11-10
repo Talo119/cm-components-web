@@ -310,7 +310,7 @@ const countries: SelectOption[] = [
 
 TextField's props work as on TextField, except those for typing text: `select`, `children`, `type`, `multiline`, the row props and `placeholder`. `ref`, `sx` and `className` reach the root `FormControl`. `aria-label` names the combobox when there's no `label`. `name` reaches a hidden `<input>`, so forms submit the value as text. TextField's `slotProps` work as in MUI, and `slotProps.option` reaches every `MenuItem`. Popup props, such as `MenuProps`, go through `slotProps.select`. Choosing several values and MUI's native `<select>` aren't supported.
 
-**Reset the value to `null` when `options` no longer include it.** MUI logs a warning for a value that isn't in the options, and the field shows nothing. The list isn't virtualized, so for long or searchable lists use Autocomplete, which is on the roadmap.
+**Reset the value to `null` when `options` no longer include it.** MUI logs a warning for a value that isn't in the options, and the field shows nothing. The list isn't virtualized, so for long or searchable lists use Autocomplete.
 
 ## Radio group
 
@@ -548,6 +548,166 @@ createCmTheme({
 ```
 
 Long labels are cut off with an ellipsis, so set a `maxWidth` with `sx` and give the full text another way. Several chips need a flex container from you to wrap with gaps.
+
+## Autocomplete
+
+`Autocomplete` lets the user pick one or several values from a list by typing to filter it, with the label, helper text and error state of a TextField. It takes an `options` array shaped like Select's, except that each `label` is a string, and keeps the type of the values:
+
+```tsx
+import { Autocomplete } from '@cmotino/cm-web-components'
+import type { AutocompleteOption } from '@cmotino/cm-web-components'
+
+const countries: AutocompleteOption[] = [
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+  { value: 'us', label: 'United States' },
+]
+
+<Autocomplete label="Country" options={countries} defaultValue="es" name="country" />
+
+<Autocomplete
+  label="Tags"
+  multiple
+  options={tagOptions}
+  value={tags}
+  onChange={(_, value) => setTags(value)}
+  helperText="Press Backspace to remove the last tag"
+/>
+```
+
+**`onChange` receives `(event, value, reason)`,** where `value` is the option's value with its type, an array with `multiple`, or `null` when cleared. `reason` is MUI's, such as `'selectOption'`, `'removeOption'` or `'clear'`. MUI's other props work, such as `loading`, `onInputChange`, `filterOptions`, `limitTags` and `renderOption`, except `renderInput`, the option getters, `freeSolo` and `groupBy`. `ref`, `sx` and `className` reach the root `<div>`, and `aria-label`, `aria-labelledby` and `aria-describedby` reach the combobox. `slotProps.textField` reaches the TextField, and MUI's slots, such as `chip` and `listbox`, work as in MUI.
+
+**With `name`, a hidden `<input>` per selected value submits the values,** not the labels, as Select does. `required` with `multiple` passes native validation once a value is selected.
+
+**Keep the selected options in `options` when searching on the server.** A value that isn't in `options` shows as an empty input or a chip with no label. Pass `filterOptions={(options) => options}`, so MUI doesn't filter the results a second time.
+
+## Tooltip
+
+`Tooltip` is MUI's `Tooltip`, with no changes. It opens on hover, keyboard focus and long press, and `Escape` closes it:
+
+```tsx
+import { Button, Tooltip } from '@cmotino/cm-web-components'
+import IconButton from '@mui/material/IconButton'
+import DeleteIcon from '@mui/icons-material/Delete'
+
+<Tooltip title="Delete">
+  <IconButton onClick={handleDelete}>
+    <DeleteIcon />
+  </IconButton>
+</Tooltip>
+
+<Tooltip title="Saves without publishing" describeChild>
+  <Button>Save draft</Button>
+</Tooltip>
+```
+
+**Without `describeChild`, a string `title` becomes the child's `aria-label`,** which names an icon-only button. A child with visible text needs `describeChild`, or its name becomes the tooltip's text. Keep `title` a string. A disabled button doesn't get pointer events or focus, so wrap it in a `<span>`, and show a reason that matters somewhere visible. `ref`, `className` and other props reach the child, and the tooltip itself is styled through `slotProps.tooltip`. Don't put links or buttons in a tooltip.
+
+## Progress
+
+`LinearProgress` and `CircularProgress` are MUI's, for loading with no end or a measured amount of a known total:
+
+```tsx
+import { CircularProgress, LinearProgress } from '@cmotino/cm-web-components'
+
+<LinearProgress aria-label="Loading orders" />
+
+<LinearProgress variant="determinate" value={uploaded} aria-label="Upload progress" />
+
+<CircularProgress variant="determinate" value={step} min={0} max={5} aria-label="Setup progress" />
+```
+
+**Name every indicator** with `aria-label`, or `aria-labelledby` pointing at visible text, because MUI gives a `progressbar` no name. Pass `aria-valuetext` when a percentage isn't meaningful, such as "Step 3 of 5". A region that's loading sets `aria-busy` and points at its indicator with `aria-describedby`. For a loading Button, use Button's `loading` prop.
+
+**LinearProgress's track is `divider`,** because MUI's tint of the bar's color is below the 3:1 that WCAG 2.2 AA asks for against a `primary` bar. `primary` and `secondary` meet 3:1 against it on both color schemes, and the other colors depend on the palette. The `buffer` variant keeps MUI's colors. This applies to every MUI `LinearProgress` under the library theme, including MUI's own. **A project's own `root` in `MuiLinearProgress.styleOverrides` replaces the library's track,** because style functions don't merge. A `bar1` object keeps it.
+
+## Alert
+
+`Alert` and `AlertTitle` are MUI's, for a short message about a task or the page:
+
+```tsx
+import { Alert, AlertTitle, Button } from '@cmotino/cm-web-components'
+
+<Alert severity="error" action={<Button color="inherit" size="small" onClick={retry}>Retry</Button>}>
+  <AlertTitle>Payment failed</AlertTitle>
+  Your card was declined. Try another card or contact your bank.
+</Alert>
+
+<Alert severity="success" role="status">Upload complete.</Alert>
+```
+
+**Choose the role.** The default `role="alert"` interrupts screen readers, which suits errors. Pass `role="status"` for messages that aren't urgent, such as "Saved", and `role="none"` for permanent notes. Screen readers announce a live region more reliably when it's already on the page, so keep a container with the role mounted and put the Alert inside it. Alert reports `onClose` and doesn't hide itself, and `action` replaces the close button. Name the close button in your language with `closeText`.
+
+**The icon of standard and outlined alerts is drawn in the text color,** because MUI's severity colors are below 3:1 there for most severities. Filled alerts keep MUI's colors. This applies to every MUI `Alert` under the library theme, including MUI's own. A project's `root` object in `MuiAlert.styleOverrides` merges with the rule, and **a `root` function replaces it,** because style functions don't merge.
+
+## Card
+
+`Card` groups the content and actions about one subject. It builds MUI's `Card` from props, so you don't assemble `CardHeader`, `CardMedia`, `CardContent` and `CardActions` yourself:
+
+```tsx
+import { Button, Card, Link, Typography } from '@cmotino/cm-web-components'
+
+<Card
+  component="article"
+  image={{ src: product.photoUrl, alt: '', height: 180 }}
+  title={<Link href={`/products/${product.id}`}>{product.name}</Link>}
+  subheader={product.price}
+  actions={<Button size="small" onClick={() => addToCart(product.id)}>Add to cart</Button>}
+  slotProps={{ title: { component: 'h3' } }}
+>
+  <Typography variant="body2" color="text.secondary">{product.summary}</Typography>
+</Card>
+```
+
+**The parts are always in this order:** `image`, then the header from `title`, `subheader`, `avatar` and `headerAction`, then `children` inside the padded content, then `actions`. Each part is only rendered when its props are set. MUI's `Card` props, such as `variant="outlined"`, `raised` and `component`, reach the root, and `slotProps` reaches each part. The image's `alt` is required, and is `''` when the image repeats the title. Pass `height` in a grid, so the layout doesn't move as images load.
+
+**The title is a `<span>`,** so pass `slotProps.title={{ component: 'h3' }}`, with the level that fits the page, to put cards in the heading outline. Buttons that repeat on every card, such as "Add to cart", should say which item they're for.
+
+## Tabs
+
+`Tabs` splits related content into panels that share one place on the page. It takes an `items` array, renders a panel for each item's `content`, and links each tab to its panel:
+
+```tsx
+import { Tabs } from '@cmotino/cm-web-components'
+import type { TabItem } from '@cmotino/cm-web-components'
+
+const items: TabItem[] = [
+  { id: 'details', label: 'Details', content: <ProjectDetails /> },
+  { id: 'activity', label: 'Activity', content: <ActivityFeed /> },
+  { id: 'settings', label: 'Settings', content: <ProjectSettings />, disabled: !canEdit },
+]
+
+<Tabs aria-label="Project" items={items} value={tab} onChange={(_, id) => setTab(id)} />
+
+<nav aria-label="Settings">
+  <Tabs
+    items={[
+      { id: '/settings/profile', label: 'Profile', href: '/settings/profile' },
+      { id: '/settings/billing', label: 'Billing', href: '/settings/billing' },
+    ]}
+    value={pathname}
+  />
+</nav>
+```
+
+**`onChange` receives `(event, id)`,** with the item's `id` and its type. Uncontrolled, the first enabled item is selected, and `null` selects none. `aria-label` and `aria-labelledby` name the tab list. Only the selected panel is rendered, so switching tabs unmounts the others and loses their state. Pass `keepMounted` to keep every panel in the DOM, hidden. `variant`, `orientation`, `centered`, `scrollButtons` and `selectionFollowsFocus` work as in MUI. Use `variant="scrollable"` for more than about four tabs or narrow screens. `slotProps.tabs`, `slotProps.tab` and `slotProps.panel` reach MUI's `Tabs`, every `Tab` and every panel.
+
+**An item with `href` is a link tab,** rendered through the router set in `MuiButtonBase.defaultProps.LinkComponent`, as for Link. It has no panel, and the selected one has `aria-current="page"`. Pass the current route as `value`.
+
+**Tabs has its own theme key, `CmTabs`,** for default props, `variants`, and the `root`, `tabs` and `panel` slots, which also get the `CmTabs-root`, `CmTabs-tabs` and `CmTabs-panel` classes:
+
+```ts
+createCmTheme({
+  components: {
+    CmTabs: {
+      defaultProps: { variant: 'scrollable' },
+      styleOverrides: { panel: ({ theme }) => ({ padding: theme.spacing(3) }) },
+    },
+  },
+})
+```
+
+**A selected tab's label is `primary.dark` in light mode and `primary.main` in dark mode,** because `primary.main` is below 4.5:1 on the light backgrounds. This applies to every MUI `Tab` under the library theme, including MUI's own. A project's `root` object in `MuiTab.styleOverrides` merges with the rule, and **a `root` function replaces it,** because style functions don't merge.
 
 ## Development
 

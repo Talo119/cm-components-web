@@ -1,4 +1,6 @@
+import { alertClasses } from '@mui/material/Alert'
 import { outlinedInputClasses } from '@mui/material/OutlinedInput'
+import { tabClasses } from '@mui/material/Tab'
 import { alpha } from '@mui/material/styles'
 import type { ThemeOptions } from '@mui/material/styles'
 import { baseShadow, brand, gray, green, orange, red } from './tokens.ts'
@@ -203,6 +205,63 @@ export const defaultThemeOptions: ThemeOptions = {
           ownerState.color === 'default'
             ? { color: (theme.vars || theme).palette.common.white }
             : {},
+      },
+    },
+    // MUI's track is a light tint of the bar's color, and `primary.main` is
+    // below 3:1 against it on both schemes. `divider` is translucent and close
+    // to the page, so the bar stands out from it on both. The buffer variant
+    // draws its own track from the buffer bar and keeps MUI's colors.
+    // A project's own `root` replaces this, because functions don't merge.
+    MuiLinearProgress: {
+      styleOverrides: {
+        root: ({ theme, ownerState }) =>
+          ownerState.variant === 'buffer'
+            ? {}
+            : { backgroundColor: (theme.vars || theme).palette.divider },
+      },
+    },
+    // MUI draws the severity icon in the severity's `main` color, which is
+    // below 3:1 on standard and outlined alerts for most severities. The text
+    // color passes on both schemes, so the icon inherits it. Filled alerts
+    // already draw the icon in their text color. Kept as an object, so a
+    // project's `root` object merges with it.
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          variants: [
+            {
+              props: { variant: 'standard' },
+              style: { [`& .${alertClasses.icon}`]: { color: 'inherit' } },
+            },
+            {
+              props: { variant: 'outlined' },
+              style: { [`& .${alertClasses.icon}`]: { color: 'inherit' } },
+            },
+          ],
+        },
+      },
+    },
+    // `primary.main` is below 4.5:1 on the light backgrounds, so a selected
+    // tab's label uses `primary.dark` in light mode, as Link does. In dark mode
+    // `primary.dark` fails instead. Kept as an object, so a project's `root`
+    // object merges with it.
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          variants: [
+            {
+              props: { textColor: 'primary' },
+              style: ({ theme }) => ({
+                [`&.${tabClasses.selected}`]: {
+                  color: (theme.vars || theme).palette.primary.dark,
+                  ...theme.applyStyles('dark', {
+                    color: (theme.vars || theme).palette.primary.main,
+                  }),
+                },
+              }),
+            },
+          ],
+        },
       },
     },
   },

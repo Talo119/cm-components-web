@@ -30,23 +30,28 @@ describe('built output', () => {
   it('keeps one module per source file', () => {
     expect(files).toContain('theme/CmThemeProvider.js')
     expect(files).toContain('theme/createCmTheme.js')
+    expect(files).toContain('components/Autocomplete/Autocomplete.js')
+    expect(files).toContain('components/Card/Card.js')
     expect(files).toContain('components/Checkbox/Checkbox.js')
     expect(files).toContain('components/Select/Select.js')
     expect(files).toContain('components/RadioGroup/RadioGroup.js')
     expect(files).toContain('components/Rating/Rating.js')
     expect(files).toContain('components/Slider/Slider.js')
     expect(files).toContain('components/Switch/Switch.js')
+    expect(files).toContain('components/Tabs/Tabs.js')
     expect(files).toContain('components/ToggleField.js')
   })
 
   it.each([
     'theme/CmThemeProvider.js',
+    'components/Autocomplete/Autocomplete.js',
     'components/Checkbox/Checkbox.js',
     'components/RadioGroup/RadioGroup.js',
     'components/Rating/Rating.js',
     'components/Select/Select.js',
     'components/Slider/Slider.js',
     'components/Switch/Switch.js',
+    'components/Tabs/Tabs.js',
     'components/ToggleField.js',
   ])(
     'keeps "use client" as the first statement of the client module %s',
@@ -57,6 +62,7 @@ describe('built output', () => {
 
   it('does not mark modules that can run on the server as client code', () => {
     expect(read('theme/createCmTheme.js')).not.toContain('use client')
+    expect(read('components/Card/Card.js')).not.toContain('use client')
   })
 
   it('is compiled by the React Compiler', () => {
@@ -84,20 +90,28 @@ describe('built output', () => {
     const api = await import(join(dist, 'index.js'))
 
     expect(Object.keys(api).sort()).toEqual([
+      'Alert',
+      'AlertTitle',
+      'Autocomplete',
       'Avatar',
       'Badge',
       'Button',
       'ButtonGroup',
+      'Card',
       'Checkbox',
       'Chip',
+      'CircularProgress',
       'CmThemeProvider',
+      'LinearProgress',
       'Link',
       'RadioGroup',
       'Rating',
       'Select',
       'Slider',
       'Switch',
+      'Tabs',
       'TextField',
+      'Tooltip',
       'Typography',
       'createCmTheme',
     ])
