@@ -709,6 +709,236 @@ createCmTheme({
 
 **A selected tab's label is `primary.dark` in light mode and `primary.main` in dark mode,** because `primary.main` is below 4.5:1 on the light backgrounds. This applies to every MUI `Tab` under the library theme, including MUI's own. A project's `root` object in `MuiTab.styleOverrides` merges with the rule, and **a `root` function replaces it,** because style functions don't merge.
 
+## List
+
+`List` shows a vertical list built from an `items` array. Each item has a `primary` line and can have `secondary`, `icon` or `avatar`, `end` content and an `action`:
+
+```tsx
+import { List } from '@cmotino/cm-web-components'
+import type { ListItemData } from '@cmotino/cm-web-components'
+
+<List
+  aria-label="Conversations"
+  items={conversations.map((c) => ({ id: c.id, primary: c.subject, secondary: c.preview, end: c.time }))}
+  value={selectedId}
+  onChange={(_, id) => setSelectedId(id)}
+/>
+
+const settings: ListItemData[] = [
+  { id: 'profile', primary: 'Profile', href: '/settings/profile' },
+  {
+    id: 'billing',
+    primary: 'Billing',
+    children: [{ id: 'invoices', primary: 'Invoices', href: '/settings/billing/invoices' }],
+  },
+]
+
+<nav aria-label="Settings">
+  <List subheader="Settings" items={settings} value={currentId} />
+</nav>
+```
+
+**How an item renders depends on its data.** With `href`, it's a link through `MuiButtonBase.defaultProps.LinkComponent`, as for Link. With `onClick`, or when the List has `onChange`, `value` or `defaultValue`, it's a button. With `children`, it's a parent that expands and collapses its nested items. Otherwise it's static. `action` sits outside the item's button, so it can hold an icon button. `end` is inside it and must not be interactive.
+
+**A List tracks a selected item only with `value` or `defaultValue`.** The selected item gets a `primary.main` bar on its start edge and `aria-current`: `"page"` for a link, `"true"` for a button. Uncontrolled, the parents of the selected item start expanded. `expanded`, `defaultExpanded` and `onExpandedChange` control that. Without `aria-label`, a `subheader` names the list.
+
+**List has its own theme key, `CmList`,** with the slots `root`, `item`, `itemButton` and `nested`, which also get the `CmList-*` classes.
+
+## Menu
+
+`Menu` opens a list of actions or links from a `trigger` button. It keeps the open state, puts `aria-haspopup`, `aria-expanded` and `aria-controls` on the trigger, and closes after each choice:
+
+```tsx
+import { Button, Menu } from '@cmotino/cm-web-components'
+import IconButton from '@mui/material/IconButton'
+
+<Menu
+  trigger={<Button>Export</Button>}
+  items={[
+    { id: 'csv', label: 'CSV' },
+    { id: 'pdf', label: 'PDF' },
+  ]}
+  onItemClick={(_, id) => exportAs(id)}
+/>
+
+<Menu
+  trigger={<IconButton aria-label="Options for Apollo"><MoreVertIcon /></IconButton>}
+  placement="bottom-end"
+  items={[
+    { id: 'edit', label: 'Edit', icon: <EditIcon />, href: '/projects/1/edit' },
+    { id: 'delete', label: 'Delete', disabled: !canDelete, onClick: confirmDelete },
+  ]}
+/>
+```
+
+**The trigger must render a focusable element that accepts `onClick`, `onKeyDown` and `ref`,** such as Button or MUI's `IconButton`. Its own `onClick`, `id` and `ref` keep working, and `preventDefault()` in its `onClick` stops the menu from opening. `ArrowDown` and `ArrowUp` on the trigger open the menu on the first or last item. Choosing an item calls its `onClick`, then `onItemClick(event, id)`. Items with `href` are links through the router set in the theme, and `current` marks one as the current page. `open`, `defaultOpen` and `onOpenChange` control the open state.
+
+**`sx`, `className` and `ref` reach the menu's paper,** because Menu has no element of its own around the trigger. MUI's `Menu` props go in `slotProps.menu`. The theme key is `CmMenu`, with the slots `root`, `paper` and `item`.
+
+## Form
+
+`Form` builds a form from field definitions, using the library's field components. It keeps the values, validates them, shows each error under its field, moves focus to the first invalid field, and calls `onSubmit` with the values:
+
+```tsx
+import { Button, Form } from '@cmotino/cm-web-components'
+import type { FormField } from '@cmotino/cm-web-components'
+
+interface Profile {
+  name: string
+  email: string
+  role: string | null
+  newsletter: boolean
+}
+
+const fields: FormField<Profile>[] = [
+  { name: 'name', type: 'text', label: 'Name', required: true },
+  { name: 'email', type: 'email', label: 'Email', required: true },
+  { name: 'role', type: 'select', label: 'Role', options: [{ value: 'admin', label: 'Admin' }] },
+  { name: 'newsletter', type: 'switch', label: 'Send me the newsletter', span: 2 },
+]
+
+<Form
+  aria-label="Profile"
+  fields={fields}
+  defaultValues={{ name: '', email: '', role: null, newsletter: false }}
+  columns={2}
+  submitLabel="Save"
+  actions={<Button variant="text" onClick={onCancel}>Cancel</Button>}
+  errors={serverErrors}
+  onSubmit={async (values) => saveProfile(values)}
+/>
+```
+
+**Each field's `type` picks a component and must fit its value's type,** or it fails to compile: `text`, `email`, `password`, `tel`, `url` and `textarea` for a `string`, `number` and `rating` for a `number | null`, `slider` for a `number`, `select`, `radio` and `autocomplete` for one of their options' values, `autocomplete` with `multiple` for an array, and `checkbox` and `switch` for a `boolean`. `required`, `minLength`, `maxLength`, `min`, `max`, and the format of `email` and `url` are checked first, then `validate(value, values)`. `validateOn` chooses whether errors first show on submit, the default, on blur or on change. `errors` shows errors from outside Form, such as the server's. `messages` replaces the English messages.
+
+**While the promise from `onSubmit` is pending,** the submit button shows a spinner and a second submit is ignored. `submitting` controls that instead. `values` and `onValuesChange` make Form controlled. A `<button type="reset">` in `actions` resets uncontrolled values. `hidden` hides a field without dropping its value.
+
+**Form keeps its state itself, with no form library.** For forms with repeating groups, steps or validation schemas, use the field components directly with React Hook Form's `Controller`, as each one takes `value`, `onChange`, `error` and `helperText`. The theme key is `CmForm`, with the slots `root`, `fields`, `field` and `actions`.
+
+## Table
+
+`Table` shows `rows` in `columns`, with sorting, pagination, row selection and an actions Menu per row:
+
+```tsx
+import { Table } from '@cmotino/cm-web-components'
+import type { TableColumn } from '@cmotino/cm-web-components'
+
+const columns: TableColumn<Order>[] = [
+  { id: 'number', header: 'Order', field: 'number', sortable: true },
+  { id: 'total', header: 'Total', field: 'total', sortable: true, align: 'right', render: (row) => formatMoney(row.total) },
+]
+
+<Table
+  aria-label="Orders"
+  columns={columns}
+  rows={orders}
+  defaultSort={{ columnId: 'number', direction: 'desc' }}
+  selectable
+  onSelectionChange={setSelectedIds}
+  rowActions={(row) => [{ id: 'view', label: 'View', href: `/orders/${row.id}` }]}
+  getRowLabel={(row) => `Order ${row.number}`}
+/>
+
+<Table
+  aria-label="Orders"
+  mode="server"
+  columns={columns}
+  rows={data.items}
+  rowCount={data.total}
+  loading={isFetching}
+  sort={sort}
+  onSortChange={setSort}
+  page={page}
+  onPageChange={(_, next) => setPage(next)}
+/>
+```
+
+**In `client` mode, the default, Table sorts and paginates every row it's given.** Strings sort numerically, so "Item 2" comes before "Item 10", and empty values come last. In `server` mode, `rows` is the current page and `rowCount` is required: Table only reports `onSortChange`, `onPageChange` and `onPageSizeChange`. Changing the sort or the page size goes back to the first page. Filtering is the consumer's, with fields in `toolbar`, in both modes.
+
+**Rows need an `id`, or `getRowId`.** `getRowLabel` names each row's checkbox and actions button, and defaults to the first column's value. Sort, page, page size and selection each work controlled and uncontrolled. `labels` replaces the English text Table adds. Table is built on MUI's `Table`, not MUI X DataGrid, so it adds no dependency and doesn't virtualize. The theme key is `CmTable`, with the slots `root`, `toolbar`, `container`, `headerCell`, `row`, `cell`, `empty` and `pagination`.
+
+## AppBar
+
+`AppBar` is MUI's `AppBar` with its `Toolbar` already inside, so its children get the bar's height and padding:
+
+```tsx
+import { AppBar, Typography } from '@cmotino/cm-web-components'
+import IconButton from '@mui/material/IconButton'
+
+<AppBar>
+  <IconButton edge="start" aria-label="Open navigation" onClick={openSidebar}>
+    <MenuIcon />
+  </IconButton>
+  <Typography variant="h6" component="p" sx={{ flexGrow: 1 }}>
+    Dashboard
+  </Typography>
+</AppBar>
+```
+
+**Under the library theme, every MUI `AppBar` is sticky, on `background.paper`, with a `divider` line and no shadow.** The theme sets `MuiAppBar.defaultProps` to `{ color: 'default', elevation: 0, position: 'sticky' }`, and `palette.AppBar.defaultBg` to each scheme's paper color. A sticky bar needs no spacer, but doesn't stick under an ancestor with `overflow: hidden`. A project that wants MUI's bar sets `MuiAppBar.defaultProps` back, such as `{ color: 'primary', position: 'fixed' }`. **`color="primary"` is below 4.5:1 for normal text** under the library theme, so keep its text large or bold. `slotProps.toolbar` reaches the `Toolbar`, such as `{ variant: 'dense' }`.
+
+## Navbar
+
+`Navbar` is a site's main navigation in an AppBar, built from `items`. Groups open a Menu, the current page is marked, and below `collapseBelow`, `md` by default, the links move into a Menu behind a button:
+
+```tsx
+import { Navbar } from '@cmotino/cm-web-components'
+import type { NavbarItem } from '@cmotino/cm-web-components'
+
+const items: NavbarItem[] = [
+  { id: 'products', label: 'Products', href: '/products' },
+  {
+    id: 'resources',
+    label: 'Resources',
+    children: [
+      { id: 'docs', label: 'Docs', href: '/docs' },
+      { id: 'blog', label: 'Blog', href: '/blog' },
+    ],
+  },
+]
+
+<Navbar
+  brand={<img src="/logo.svg" alt="Acme" height={28} />}
+  brandHref="/"
+  items={items}
+  value={currentSectionId}
+  actions={<AccountMenu />}
+/>
+```
+
+**Links use the router set in the theme,** as for Link: the brand through `MuiLink.defaultProps.component`, and the items through `MuiButtonBase.defaultProps.LinkComponent`. The item matching `value` gets `aria-current="page"`, a `primary` label and a line under it, and a group holding it shows as current too. Map the route to `value` yourself. Both layouts are rendered and CSS hides one, so the server's HTML already matches the screen. The `<nav>` is named "Main". Pass `labels` for another name or language. Navbar takes AppBar's props, such as `position` and `color`. The theme key is `CmNavbar`, with the slots `root`, `brand`, `nav`, `item` and `actions`.
+
+## Sidebar
+
+`Sidebar` is an app's main navigation in a column at the side, built on MUI's `Drawer` and List. With `variant="responsive"`, the default, it's permanent from `breakpoint` up, `md` by default, and a temporary drawer below:
+
+```tsx
+import { AppBar, Sidebar } from '@cmotino/cm-web-components'
+import type { SidebarSection } from '@cmotino/cm-web-components'
+import Box from '@mui/material/Box'
+
+const sections: SidebarSection[] = [
+  { id: 'main', items: [{ id: 'orders', label: 'Orders', icon: <ReceiptIcon />, href: '/orders', end: 12 }] },
+  { id: 'admin', title: 'Admin', items: [{ id: 'settings', label: 'Settings', href: '/settings' }] },
+]
+
+<Box sx={{ display: 'flex' }}>
+  <Sidebar
+    sections={sections}
+    value={currentPageId}
+    open={open}
+    onOpenChange={(_, next) => setOpen(next)}
+    header={<Logo />}
+  />
+  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+    <AppBar>{/* a button with sx={{ display: { md: 'none' } }} that calls setOpen(true) */}</AppBar>
+    <Box component="main">{children}</Box>
+  </Box>
+</Box>
+```
+
+**Place it first in a flex row,** where its root takes `width` while it's permanent. The permanent drawer's paper is fixed to the full height of the window, so put the AppBar in the content column. Following a link in the temporary drawer calls `onItemClick`, then `onOpenChange(event, false)`, and the drawer also closes when the screen widens past `breakpoint`. The button that opens it is yours. Items are links or parents with `children`, and `items` makes one section without a title. The theme key is `CmSidebar`, with the slots `root`, `paper`, `header`, `nav` and `footer`.
+
 ## Development
 
 Use the Node version in `.nvmrc`, then:

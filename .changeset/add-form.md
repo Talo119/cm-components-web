@@ -1,0 +1,5 @@
+---
+'@cmotino/cm-web-components': minor
+---
+
+Add `Form`, which builds a `<form>` from field definitions with the library's field components: `text`, `email`, `password`, `tel`, `url`, `textarea`, `number`, `select`, `radio`, `autocomplete`, `checkbox`, `switch`, `slider` and `rating`. Each field's `type` must fit the type of its value, or it fails to compile. Form keeps the values, controlled with `values` and `onValuesChange` or uncontrolled with `defaultValues`, checks `required`, lengths, ranges, email and URL formats and a field's own `validate`, shows each error under its field, moves focus to the first invalid field, and calls `onSubmit(values, event)` when they're valid. `validateOn` shows errors on submit, blur or change. While the promise from `onSubmit` is pending, the submit button shows a spinner and the form has `aria-busy="true"`. `errors` shows errors from outside Form, `messages` replaces the English messages, and `columns` and a field's `span` lay the fields out in a grid from the `sm` breakpoint up. Form adds no form library. The theme key is `components.CmForm`, with the `root`, `fields`, `field` and `actions` slots.

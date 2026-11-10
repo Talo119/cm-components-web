@@ -5,6 +5,9 @@ import { alpha } from '@mui/material/styles'
 import type { ThemeOptions } from '@mui/material/styles'
 import { baseShadow, brand, gray, green, orange, red } from './tokens.ts'
 
+// Each scheme's `background.paper`, also used as the default AppBar's color.
+const paper = { light: 'hsl(220, 35%, 97%)', dark: 'hsl(220, 30%, 7%)' }
+
 // Font sizes are in rem, as MUI's `pxToRem` gives them at its default 14px font size.
 export const defaultThemeOptions: ThemeOptions = {
   cssVariables: true,
@@ -28,10 +31,12 @@ export const defaultThemeOptions: ThemeOptions = {
         success: { light: green[300], main: green[400], dark: green[800] },
         grey: { ...gray },
         divider: alpha(gray[300], 0.4),
-        background: { default: 'hsl(0, 0%, 99%)', paper: 'hsl(220, 35%, 97%)' },
+        background: { default: 'hsl(0, 0%, 99%)', paper: paper.light },
         text: { primary: gray[800], secondary: gray[600] },
         action: { hover: alpha(gray[200], 0.2), selected: alpha(gray[200], 0.3) },
         baseShadow: baseShadow.light,
+        // MUI's `color="default"` bar reads this, which is `grey[100]` by default.
+        AppBar: { defaultBg: paper.light },
       },
     },
     dark: {
@@ -53,10 +58,11 @@ export const defaultThemeOptions: ThemeOptions = {
         success: { light: green[400], main: green[500], dark: green[700] },
         grey: { ...gray },
         divider: alpha(gray[700], 0.6),
-        background: { default: gray[900], paper: 'hsl(220, 30%, 7%)' },
+        background: { default: gray[900], paper: paper.dark },
         text: { primary: 'hsl(0, 0%, 100%)', secondary: gray[400] },
         action: { hover: alpha(gray[600], 0.2), selected: alpha(gray[600], 0.3) },
         baseShadow: baseShadow.dark,
+        AppBar: { defaultBg: paper.dark },
       },
     },
   },
@@ -80,6 +86,26 @@ export const defaultThemeOptions: ThemeOptions = {
   shape: { borderRadius: 8 },
   focusVisible: true,
   components: {
+    // MUI's default `primary` bar puts `contrastText` on `primary.main` at
+    // 3.65:1, below 4.5:1 for the bar's title. A bar on the paper color, with
+    // a line instead of a shadow, matches the library's flat surfaces. Sticky,
+    // so it needs no spacer. Kept as an object, so a project's `root` object
+    // merges with it.
+    MuiAppBar: {
+      defaultProps: { color: 'default', elevation: 0, position: 'sticky' },
+      styleOverrides: {
+        root: {
+          variants: [
+            {
+              props: { color: 'default' },
+              style: ({ theme }) => ({
+                borderBottom: `1px solid ${(theme.vars || theme).palette.divider}`,
+              }),
+            },
+          ],
+        },
+      },
+    },
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: { root: { textTransform: 'none' } },
