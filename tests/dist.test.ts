@@ -30,9 +30,17 @@ describe('built output', () => {
   it('keeps one module per source file', () => {
     expect(files).toContain('theme/CmThemeProvider.js')
     expect(files).toContain('theme/createCmTheme.js')
+    expect(files).toContain('components/AppBar/AppBar.js')
     expect(files).toContain('components/Autocomplete/Autocomplete.js')
     expect(files).toContain('components/Card/Card.js')
     expect(files).toContain('components/Checkbox/Checkbox.js')
+    expect(files).toContain('components/Form/Form.js')
+    expect(files).toContain('components/List/List.js')
+    expect(files).toContain('components/Menu/Menu.js')
+    expect(files).toContain('components/Navbar/Navbar.js')
+    expect(files).toContain('components/Sidebar/Sidebar.js')
+    expect(files).toContain('components/Table/Table.js')
+    expect(files).toContain('components/icons.js')
     expect(files).toContain('components/Select/Select.js')
     expect(files).toContain('components/RadioGroup/RadioGroup.js')
     expect(files).toContain('components/Rating/Rating.js')
@@ -46,11 +54,17 @@ describe('built output', () => {
     'theme/CmThemeProvider.js',
     'components/Autocomplete/Autocomplete.js',
     'components/Checkbox/Checkbox.js',
+    'components/Form/Form.js',
+    'components/List/List.js',
+    'components/Menu/Menu.js',
+    'components/Navbar/Navbar.js',
     'components/RadioGroup/RadioGroup.js',
     'components/Rating/Rating.js',
     'components/Select/Select.js',
+    'components/Sidebar/Sidebar.js',
     'components/Slider/Slider.js',
     'components/Switch/Switch.js',
+    'components/Table/Table.js',
     'components/Tabs/Tabs.js',
     'components/ToggleField.js',
   ])(
@@ -63,6 +77,7 @@ describe('built output', () => {
   it('does not mark modules that can run on the server as client code', () => {
     expect(read('theme/createCmTheme.js')).not.toContain('use client')
     expect(read('components/Card/Card.js')).not.toContain('use client')
+    expect(read('components/AppBar/AppBar.js')).not.toContain('use client')
   })
 
   it('is compiled by the React Compiler', () => {
@@ -92,6 +107,7 @@ describe('built output', () => {
     expect(Object.keys(api).sort()).toEqual([
       'Alert',
       'AlertTitle',
+      'AppBar',
       'Autocomplete',
       'Avatar',
       'Badge',
@@ -102,13 +118,19 @@ describe('built output', () => {
       'Chip',
       'CircularProgress',
       'CmThemeProvider',
+      'Form',
       'LinearProgress',
       'Link',
+      'List',
+      'Menu',
+      'Navbar',
       'RadioGroup',
       'Rating',
       'Select',
+      'Sidebar',
       'Slider',
       'Switch',
+      'Table',
       'Tabs',
       'TextField',
       'Tooltip',

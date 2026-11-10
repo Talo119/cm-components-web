@@ -1,0 +1,5 @@
+---
+'@cmotino/cm-web-components': minor
+---
+
+Add `Table`, built on MUI's `Table`, which takes `columns` of `{ id, header, field?, getValue?, render?, sortable?, compare?, align?, width? }` and `rows`. In `client` mode, Table sorts and paginates every row, with strings in numeric order and empty values last. In `server` mode, `rows` is the current page and `rowCount` is required, and Table reports `onSortChange`, `onPageChange` and `onPageSizeChange` for the consumer to fetch. Sort, page, page size and selection each work controlled and uncontrolled. `selectable` adds a checkbox column, with a header checkbox for the current page, and `rowActions` adds a Menu per row, both named with `getRowLabel`. `loading` shows a progress bar and sets `aria-busy`, `emptyState` replaces "No rows", `toolbar` holds search and filter fields, and `labels` replaces the English text. The scrolling region is focusable and named like the table. The theme key is `components.CmTable`, with the `root`, `toolbar`, `container`, `headerCell`, `row`, `cell`, `empty` and `pagination` slots.
