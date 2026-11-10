@@ -1,0 +1,5 @@
+---
+'@cmotino/cm-web-components': minor
+---
+
+Add `Tabs`, which takes an `items` array of `{ id, label, icon?, disabled?, content? }`, or `href` in place of `content` for link tabs. Each item's `content` is shown in a `tabpanel` linked to its tab. Only the selected panel is rendered, unless `keepMounted` keeps every panel in the DOM, hidden. `value`, `defaultValue` and `onChange` use the item's `id`, with its type, and `null` means no tab is selected. Link tabs render through `MuiButtonBase.defaultProps.LinkComponent`, so they use the project's router, and the selected one has `aria-current="page"`. `aria-label` and `aria-labelledby` name the tab list. Tabs is the first composite, with its own `components.CmTabs` theme key for default props, variants and the `root`, `tabs` and `panel` slots. The default theme now colors a selected MUI `Tab`'s label `primary.dark` in light mode and `primary.main` in dark mode, so it meets 4.5:1 on both color schemes. This also applies to MUI's own `Tab` under the library theme. A project's `MuiTab.styleOverrides.root` object merges with this rule, and a `root` function replaces it.
